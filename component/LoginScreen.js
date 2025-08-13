@@ -1,4 +1,3 @@
-// LoginScreen.js
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert, ActivityIndicator
@@ -14,7 +13,7 @@ export default function LoginScreen({ navigation }) {
   const API_BASE_URL = "http://192.168.150.59:3000/api/auth";
 
   const handleLogin = async () => {
-    if (!email || !password) {
+    if (!email || !password) { // Gerekli alanlar boş
       Alert.alert("Uyarı", "Lütfen e-posta ve şifrenizi girin");
       return;
     }
@@ -23,14 +22,14 @@ export default function LoginScreen({ navigation }) {
       setLoading(true);
 
       const response = await fetch(`${API_BASE_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, // JSON gönder
+        body: JSON.stringify({ email, password }),  
       });
 
-      const data = await response.json();
+      const data = await response.json(); // JSON cevabını al
 
-      if (!response.ok) {
+      if (!response.ok) { // HTTP hatası 
         Alert.alert("Hata", data?.message || "E-posta veya şifre hatalı");
         return;
       }
@@ -41,7 +40,7 @@ export default function LoginScreen({ navigation }) {
         return;
       }
 
-      // ✅ Token zorunlu
+      // Token zorunlu
       const token = data?.token;
       if (!token || typeof token !== 'string' || token.length < 10) {
         Alert.alert("Hata", "Token alınamadı. Backend login cevabında 'token' döndüğünü doğrula.");
@@ -49,7 +48,7 @@ export default function LoginScreen({ navigation }) {
       }
 
       // Eski boş token kaydını temizle ve yeni token'ı yaz
-      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('token');  //remove  
       await AsyncStorage.multiSet([
         ['userId', String(user._id)],
         ['user', JSON.stringify(user)],

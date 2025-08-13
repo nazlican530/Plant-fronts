@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
+  ActivityIndicator, 
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -75,15 +75,15 @@ export default function ProfileScreen() {
     }
 
     const mediaTypes =
-      ImagePicker?.MediaTypeOptions?.Images ??
+      ImagePicker?.MediaTypeOptions?.Images ?? // Expo SDK 48 ve üzeri için 
       ImagePicker?.MediaType?.Image ??
       undefined;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       ...(mediaTypes ? { mediaTypes } : {}),
       allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
+      aspect: [1, 1], // Kare olarak kırpma 
+      quality: 1, // Yüksek kalite 
     });
 
     const canceled = result?.canceled ?? result?.cancelled ?? false;
@@ -137,7 +137,7 @@ export default function ProfileScreen() {
     }
   };
 
-  // 🔹 Log Out Fonksiyonu
+  //  Log Out Fonksiyonu
   const handleLogout = async () => {
     await AsyncStorage.removeItem('user');
     await AsyncStorage.removeItem('userId');

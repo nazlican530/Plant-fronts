@@ -48,7 +48,7 @@ export default function RegisterScreen({ navigation }) {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok) {  //Backend hata dönerse uyarı gösterilir.
         const msg = data?.message || "Kayıt başarısız";
         Alert.alert("Hata", msg);
         return;
@@ -57,11 +57,11 @@ export default function RegisterScreen({ navigation }) {
       // Beklenen: { success: true, data: { _id, firstName, ... }, token? }
       const user = data?.data;
       if (!user?._id) {
-        Alert.alert("Hata", "Kullanıcı bilgisi eksik geldi.");
+        Alert.alert("Hata", "Kullanıcı bilgisi eksik geldi."); // id eksik Backend'den beklenen kullanıcı bilgisi eksik
         return;
       }
 
-      // ✅ Otomatik login: userId, user ve token'ı sakla
+      // Otomatik login: userId, user ve token'ı sakla
       await AsyncStorage.multiSet([
         ['userId', String(user._id)],
         ['user', JSON.stringify(user)],
@@ -70,8 +70,8 @@ export default function RegisterScreen({ navigation }) {
 
       Alert.alert("Başarılı", "Kayıt tamamlandı! Giriş yapıldı.");
 
-      // 🔁 Geri ile kayıt ekranına dönmeyi engelle
-      navigation.reset({ index: 0, routes: [{ name: 'HomeScreen' }] });
+      //  Geri ile kayıt ekranına dönmeyi engelle
+      navigation.reset({ index: 0, routes: [{ name: 'LoginScreen' }] });
 
     } catch (error) {
       console.error(error);
