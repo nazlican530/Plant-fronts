@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute, useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const BASE_URL = "http://192.168.150.59:3000";
 const API_FAVORITES_BASE = `${BASE_URL}/api/favorites`;
@@ -53,26 +54,40 @@ export default function PlantInfoScreen() {
   };
 
   const addToFavoritesAndGo = async () => {
-    try {
-      setBusy(true);
-      const userId = "689463c783ec777b054c1aa7"; // TODO: auth'tan al
-      const resp = await fetch(API_FAVORITES_BASE, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, plantId: plant._id }),
-      });
-      if (!resp.ok) {
-        const t = await resp.text();
-        throw new Error(t || "Favori ekleme başarısız");
-      }
-      // Favoriler ekranına git (o ekran backend'den çekiyorsa ekstra param gerekmez)
-      navigation.navigate("FavoritePlantsScreen", { from: "detail", justAdded: plant });
-    } catch (e) {
-      Alert.alert("Hata", e.message);
-    } finally {
-      setBusy(false);
+  try {
+    setBusy(true);
+
+    // Kullanıcı id’si auth veya AsyncStorage’dan alınır
+    const raw = await AsyncStorage.getItem("user");
+    const storedUser = raw ? JSON.parse(raw) : null;
+    const userId = storedUser?._id;
+
+    if (!userId) {
+      Alert.alert("Hata", "Kullanıcı bulunamadı. Lütfen giriş yapın.");
+      return;
     }
-  };
+
+    const resp = await fetch(API_FAVORITES_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, plantId: plant._id }),
+    });
+
+    if (!resp.ok) {
+      const t = await resp.text();
+      throw new Error(t || "Favori ekleme başarısız");
+    }
+
+    // Favoriler ekranına git
+    navigation.navigate("FavoritePlantsScreen", { from: "detail", justAdded: plant });
+
+  } catch (e) {
+    Alert.alert("Hata", e.message);
+  } finally {
+    setBusy(false);
+  }
+};
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
